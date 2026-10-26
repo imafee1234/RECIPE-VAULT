@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,7 +7,7 @@ import { getRecipes, saveRecipes, getFavorites, saveFavorites } from "../data/re
 
 export default function UserDashboardPage({ refreshKey, refreshRecipes }) {
  const [version,setVersion]=useState(0);
- const recipes=useMemo(()=>getRecipes(),[refreshKey,version]);
+ const recipes=getRecipes();
  const favorites=getFavorites();
  const favoriteRecipes=recipes.filter(r=>favorites.includes(r.id));
  const removeRecipe=id=>{if(!window.confirm("Delete this recipe from your vault? This cannot be undone."))return;saveRecipes(recipes.filter(r=>r.id!==id));saveFavorites(favorites.filter(x=>x!==id));setVersion(v=>v+1);refreshRecipes?.();};

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -11,7 +11,7 @@ export default function RecipeSearchPage({ refreshKey }) {
  const [term,setTerm]=useState(params.get("keyword")||"");
  const [category,setCategory]=useState("All categories");
  const [favoriteVersion,setFavoriteVersion]=useState(0);
- const recipes=useMemo(()=>getRecipes(),[refreshKey]);
+ const recipes=getRecipes();
  useEffect(()=>setTerm(new URLSearchParams(location.search).get("keyword")||""),[location.search]);
  const results=recipes.filter(r=>(r.title||r.name||"").toLowerCase().includes(term.trim().toLowerCase()) && (category==="All categories"||r.category===category));
  const toggleFavorite=id=>{const ids=getFavorites();saveFavorites(ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);setFavoriteVersion(v=>v+1);};

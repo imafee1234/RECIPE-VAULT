@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,7 +7,7 @@ import { getRecipes, saveRecipes } from "../data/recipes";
 
 export default function AddEditRecipePage({ refreshRecipes }) {
  const {id}=useParams(), navigate=useNavigate();
- const recipes=useMemo(()=>getRecipes(),[id]);
+ const recipes=getRecipes();
  const existing=id?recipes.find(r=>String(r.id)===String(id)):null;
  const submit=data=>{
   const latest=getRecipes();

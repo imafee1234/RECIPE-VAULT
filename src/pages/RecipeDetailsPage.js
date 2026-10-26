@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { getRecipes, getFavorites, saveFavorites, imageFallback } from "../data/recipes";
 
 export default function RecipeDetailsPage({ refreshRecipes }) {
- const {id}=useParams(), navigate=useNavigate();
- const recipe=useMemo(()=>getRecipes().find(r=>String(r.id)===String(id)),[id]);
+ const {id}=useParams();
+ const recipe=getRecipes().find(r=>String(r.id)===String(id));
  const [favorite,setFavorite]=useState(()=>getFavorites().includes(String(id))||getFavorites().includes(id));
  if(!recipe)return <div><Header/><main className="page-wrap empty-state"><h1>Recipe not found</h1><p>This recipe may have been removed from your vault.</p><Link className="button button-primary" to="/search">Explore recipes</Link></main><Footer/></div>;
  const isFavorite=getFavorites().includes(recipe.id)||favorite;

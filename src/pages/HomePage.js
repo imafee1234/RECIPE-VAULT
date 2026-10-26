@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -6,9 +6,9 @@ import RecipeCard from "../components/RecipeCard";
 import { getRecipes, getFavorites, saveFavorites } from "../data/recipes";
 
 export default function HomePage({ refreshKey }) {
- const recipes = useMemo(()=>getRecipes(),[refreshKey]);
- const [favoriteVersion, setFavoriteVersion] = React.useState(0);
- const featured = recipes.slice(0,3); void favoriteVersion;
+ const recipes = getRecipes();
+ const [, setFavoriteVersion] = React.useState(0);
+ const featured = recipes.slice(0,3);
  return <div><Header/><main className="page-wrap">
   <section className="hero">
    <div className="hero-copy"><span className="eyebrow">YOUR LITTLE CORNER OF FLAVOUR</span><h1>Good food.<br/><span style={{color:"var(--green)"}}>Beautifully</span> gathered.</h1><p>Keep the recipes you love in one thoughtful place. Find fresh inspiration, save family favourites, and make something delicious today.</p><div className="hero-actions"><Link className="button button-primary" to="/search">Explore recipes ↗</Link><Link className="button button-secondary" to="/add-recipe">＋ Add your own</Link></div></div>
