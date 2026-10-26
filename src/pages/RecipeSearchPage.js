@@ -1,101 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // Hook to get query params
+import React, { useMemo, useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import RecipeCard from "../components/RecipeCard";
-import "./RecipeSearchPage.css";
+import { getRecipes, getFavorites, saveFavorites } from "../data/recipes";
 
-const RecipeSearchPage = () => {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  
-  const location = useLocation();
-  const navigate = useNavigate();
-  
-  // Get the query parameter 'keyword' from the URL
-  const queryParams = new URLSearchParams(location.search);
-  const keyword = queryParams.get("keyword") || ""; // Default to empty if no keyword
-
-  // Update the search term when the keyword changes in the URL
-  useEffect(() => {
-    setSearchTerm(keyword);
-  }, [keyword]);
-
-  const sampleRecipes = [
-    { id: 1, title: "Spaghetti", image: "/image.png" },
-    { id: 2, title: "Chicken", image: "/image copy 3.png" },
-    { id: 3, title: "Suya", image: "/image copy 2.png" },
-    { id: 4, title: "Egusi Soup", image: "/image copy 3.png" },
-    { id: 5, title: "Egusi Soup", image: "/image copy 3.png" },
-    { id: 6, title: "Egusi Soup", image: "/image copy 3.png" },
-    { id: 7, title: "Egusi Soup", image: "/image copy 3.png" },
-  ];
-
-  
-  useEffect(() => {
-    if (searchTerm.trim()) {
-      setLoading(true);
-      const filteredResults = sampleRecipes.filter((recipe) =>
-        recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setResults(filteredResults);
-    } else {
-      setResults([]); 
-    }
-    setLoading(false);
-  }, [searchTerm]);
-
-  // Handle search submit (optional if you want the search bar inside RecipeSearchPage)
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?keyword=${searchTerm}`); // Navigate to the same page with search term in URL
-    }
-  };
-
-  return (
-    <div className="recipe-search-page">
-      <Header setSearchKeyword={setSearchTerm} /> {/* Allow updating searchTerm from Header */}
-      <main className="search-main-content">
-        <form onSubmit={handleSearchSubmit} className="search-form">
-          <input
-            className="search-bar"
-            type="text"
-            placeholder="Search recipes..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)} // Update searchTerm as user types
-          />
-          <button type="submit" className="search-button">Search</button>
-        </form>
-        
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-            <h1 className="search-title">
-              {results.length > 0
-                ? `Search Results for: "${searchTerm}"`
-                : `No Results Found for: "${searchTerm}"`
-                }
-            </h1>
-            <div className="recipe-grid">
-              {results.length > 0 ? (
-                results.map((recipe) => (
-                  <RecipeCard key={recipe.id} recipe={recipe} />
-                ))
-              ) : (
-                <p className="no-results">
-                  Sorry, we couldn't find any recipes matching "{searchTerm}".
-                </p>
-              )}
-            </div>
-          </>
-        )}
-      </main>
-      <Footer />
-    </div>
-  );
-};
-
-export default RecipeSearchPage;
+export default function RecipeSearchPage({ refreshKey }) {
+ const location=useLocation(), navigate=useNavigate();
+ const params=new URLSearchParams(location.search);
+ const [term,setTerm]=useState(params.get("keyword")||"");
+ const [category,setCategory]=useState("All categories");
+ const [favoriteVersion,setFavoriteVersion]=useState(0);
+ const recipes=useMemo(()=>getRecipes(),[refreshKey]);
+ useEffect(()=>setTerm(new URLSearchParams(location.search).get("keyword")||""),[location.search]);
+ const results=recipes.filter(r=>(r.title||r.name||"").toLowerCase().includes(term.trim().toLowerCase()) && (category==="All categories"||r.category===category));
+ const toggleFavorite=id=>{const ids=getFavorites();saveFavorites(ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);setFavoriteVersion(v=>v+1);};
+ void favoriteVersion;
+ return <div><Header/><main className="page-wrap"><div className="search-heading"><span className="eyebrow">BROWSE THE COLLECTION</span><h1>Find your next favourite.</h1><p>Search by dish name or explore by category.</p></div>
+  <form className="search-controls" onSubmit={e=>{e.preventDefault();navigate(`/search?keyword=${encodeURIComponent(term.trim())}`);}}><input className="search-input" aria-label="Search recipes" placeholder="Try “jollof”, “pasta”, “cake”..." value={term} onChange={e=>setTerm(e.target.value)}/><select className="filter-select" aria-label="Filter by category" value={category} onChange={e=>setCategory(e.target.value)}><option>All categories</option>{[...new Set(recipes.map(r=>r.category).filter(Boolean))].sort().map(c=><option key={c}>{c}</option>)}</select><button className="button button-primary">Search</button></form>
+  <div className="section-head"><div><h2>{results.length} {results.length===1?"recipe":"recipes"} found</h2><p>{term?`Showing matches for “${term}”`:"Browse all available recipes."}</p></div></div>
+  {results.length?<div className="recipe-grid">{results.map(r=><RecipeCard key={r.id} recipe={r} favorite={getFavorites().includes(r.id)} onToggleFavorite={toggleFavorite}/>)}</div>:<div className="empty-state"><h3>No recipes found just yet.</h3><p>Try a different search or add this recipe to your own vault.</p><Link className="button button-primary" to="/add-recipe">＋ Add a recipe</Link></div>}
+ </main><Footer/></div>;
+}

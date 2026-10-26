@@ -1,17 +1,5 @@
-import React from 'react';
-import './Footer.css';
-
-const Footer = () => {
-  return (
-    <footer className="footer">
-      <p>&copy; 2025 RecipeVault. All rights reserved.</p>
-      <div className="footer-links">
-        <a href="/privacy">Privacy Policy</a>
-        <span>|</span>
-        <a href="/terms">Terms of Service</a>
-      </div>
-    </footer>
-  );
-};
-
-export default Footer;
+import React from "react";
+import { Link } from "react-router-dom";
+export default function Footer() {
+ return <footer className="site-footer"><div className="footer-inner"><span>© {new Date().getFullYear()} RecipeVault · Made for the love of good food.</span><div className="footer-links"><Link to="/">Home</Link><Link to="/search">Explore recipes</Link><Link to="/dashboard">My vault</Link></div></div></footer>;
+}

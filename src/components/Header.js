@@ -1,46 +1,26 @@
-
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import './Header.css';
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
-const Header = ({ setSearchKeyword }) => {
-const [searchTerm, setSearchTerm] = useState("");
-const navigate = useNavigate();
-
-const handleSearchNavigation = () => {
-navigate(`/search?keyword=${searchTerm}`);
-};
-
-const handleSearchSubmit = (e) => {
-e.preventDefault();
-if (searchTerm.trim()) {
-setSearchKeyword(searchTerm);
-handleSearchNavigation();
+export default function Header() {
+  const [term, setTerm] = useState("");
+  const navigate = useNavigate();
+  const submit = (event) => {
+    event.preventDefault();
+    navigate(`/search?keyword=${encodeURIComponent(term.trim())}`);
+  };
+  return <header className="site-header">
+    <div className="header-inner">
+      <Link to="/" className="brand" aria-label="Recipe Vault home"><span className="brand-mark">♨</span><span>Recipe<em>Vault</em></span></Link>
+      <form className="header-search" onSubmit={submit} role="search">
+        <input aria-label="Search recipes" placeholder="Find your next favourite..." value={term} onChange={e=>setTerm(e.target.value)} />
+        <button type="submit">Search</button>
+      </form>
+      <nav className="main-nav" aria-label="Main navigation">
+        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/search">Explore</NavLink>
+        <NavLink to="/dashboard">My Vault</NavLink>
+        <NavLink to="/add-recipe">＋ Add recipe</NavLink>
+      </nav>
+    </div>
+  </header>;
 }
-};
-
-return (
-<header className="header">
-<div className="logo">RecipeVault</div>
-<form onSubmit={handleSearchSubmit} className="search-form">
-<input
-className="search-bar"
-type="text"
-placeholder="Search recipes..."
-value={searchTerm}
-onChange={(e) => setSearchTerm(e.target.value)}
-/>
-<button type="submit" className="search-button">Search</button>
-</form>
-<nav className="nav">
-<Link to="/">Home</Link>
-<Link to="/search">Search</Link>
-<Link to="/dashboard">Dashboard</Link>
-<Link to="/recipe/1">Recipe Details</Link>
-<Link to="/add-recipe">Add Recipe</Link>
-</nav>
-</header>
-);
-};
-
-export default Header;
